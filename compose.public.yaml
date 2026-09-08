@@ -1,0 +1,8 @@
+services:
+  app:
+    # The public gateway connects only the app to its dedicated origin network.
+    ports: !reset []
+    environment:
+      PUBLIC_URL: ${PUBLIC_URL:?Set PUBLIC_URL}
+    networks:
+      default: {}
