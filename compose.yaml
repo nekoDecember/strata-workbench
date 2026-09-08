@@ -1,0 +1,99 @@
+name: strata
+services:
+  app:
+    build:
+      context: .
+      target: app
+    init: true
+    ports:
+      - "${STRATA_BIND:-127.0.0.1}:${STRATA_PORT:-8080}:8080"
+    environment:
+      STRATA_DATA_DIR: /data
+      STRATA_JOBS_DIR: /jobs
+      STRATA_TOKEN_FILE: /run/secrets/app_token
+      STRATA_CONNECTIONS_FILE: /run/secrets/connections
+      STRATA_MAX_ROWS: ${STRATA_MAX_ROWS:-2000000}
+    secrets:
+      - app_token
+      - connections
+    volumes:
+      - workspace:/data
+      - jobs:/jobs
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 4g
+    pids_limit: 128
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    build:
+      context: .
+      target: worker
+    init: true
+    environment:
+      STRATA_JOBS_DIR: /jobs
+      STRATA_PYTHON_TIMEOUT: ${STRATA_PYTHON_TIMEOUT:-90}
+    volumes:
+      - jobs:/jobs
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 2g
+    cpus: 2
+    pids_limit: 96
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, python, -c, "import os,time; assert time.time()-os.stat('/jobs/heartbeat.json').st_mtime < 20"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  notebook:
+    profiles: [notebook]
+    build:
+      context: .
+      target: notebook
+    init: true
+    ports:
+      - "${STRATA_BIND:-127.0.0.1}:${STRATA_NOTEBOOK_PORT:-8888}:8888"
+    environment:
+      STRATA_URL: http://app:8080
+      STRATA_TOKEN_FILE: /run/secrets/app_token
+      JUPYTER_TOKEN_FILE: /run/secrets/notebook_token
+    secrets:
+      - app_token
+      - notebook_token
+    volumes:
+      - notebooks:/notebooks
+    depends_on:
+      app:
+        condition: service_healthy
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 3g
+    pids_limit: 128
+    restart: unless-stopped
+
+secrets:
+  app_token:
+    file: ./secrets/app_token.txt
+  notebook_token:
+    file: ./secrets/notebook_token.txt
+  connections:
+    file: ./secrets/connections.json
+
+volumes:
+  workspace:
+  jobs:
+  notebooks:

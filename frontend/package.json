@@ -1,0 +1,33 @@
+{
+  "name": "strata-workbench-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@codemirror/lang-python": "^6.2.0",
+    "@glideapps/glide-data-grid": "6.0.3",
+    "@uiw/react-codemirror": "^4.23.12",
+    "lodash": "^4.17.21",
+    "lucide-react": "^0.468.0",
+    "marked": "^4.3.0",
+    "plotly.js-dist-min": "^3.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-responsive-carousel": "^3.2.23"
+  },
+  "devDependencies": {
+    "@types/plotly.js": "^3.0.2",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "@vitejs/plugin-react": "^4.4.1",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.3"
+  }
+}

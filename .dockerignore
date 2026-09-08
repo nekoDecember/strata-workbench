@@ -1,0 +1,13 @@
+.git
+.venv
+.env
+.env.*
+secrets
+data
+jobs
+notebooks/private
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+**/dist
+*.zip
