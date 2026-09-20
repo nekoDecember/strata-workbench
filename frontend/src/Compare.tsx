@@ -3,7 +3,30 @@ import { Columns2, Pin as PinIcon, Trash2 } from "lucide-react";
 import Chart from "./Chart";
 import { request } from "./api";
 import type { ChartData, Filter, Pin } from "./types";
-import { queryForChart } from "./state";
+import { format, queryForChart } from "./state";
+
+const operatorLabels: Record<Filter["op"], string> = {
+  eq: "=",
+  ne: "≠",
+  gt: ">",
+  ge: "≥",
+  lt: "<",
+  le: "≤",
+  contains: "含む",
+  in: "いずれか",
+  not_in: "いずれでもない",
+  is_null: "欠損",
+  not_null: "欠損以外",
+};
+
+function describeFilter(filter: Filter) {
+  if (["is_null", "not_null"].includes(filter.op))
+    return `${filter.column} ${operatorLabels[filter.op]}`;
+  const value = Array.isArray(filter.value)
+    ? filter.value.map((item) => format(item)).join(", ")
+    : format(filter.value);
+  return `${filter.column} ${operatorLabels[filter.op]} ${value}`;
+}
 export default function Compare({
   datasetId,
   pins,
@@ -120,8 +143,13 @@ export default function Compare({
               </button>
             </div>
             <div className="snapshot-meta">
-              r{p.view.revision} · {p.config.group || "層別なし"} · 条件{" "}
-              {p.view.filters.length}件
+              <span>r{p.view.revision}</span>
+              <span>{p.config.group || "層別なし"}</span>
+              {p.view.filters.length > 0 && (
+                <span className="snapshot-filter">
+                  {p.view.filters.map(describeFilter).join(" · ")}
+                </span>
+              )}
               {p.view.selection_only ? " · 選択行のみ" : ""}
               {data[p.id] && ` · n=${data[p.id].total.toLocaleString()}`}
               {p.view.revision !== revision && " · 閲覧専用"}

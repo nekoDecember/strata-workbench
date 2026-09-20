@@ -12,6 +12,20 @@ import {
 import type { Column, Filter, Profile, View } from "./types";
 import { format } from "./state";
 
+const operatorLabels: Record<Filter["op"], string> = {
+  eq: "等しい",
+  ne: "等しくない",
+  gt: "より大きい",
+  ge: "以上",
+  lt: "より小さい",
+  le: "以下",
+  contains: "含む",
+  in: "いずれか",
+  not_in: "いずれでもない",
+  is_null: "欠損",
+  not_null: "欠損以外",
+};
+
 type Props = {
   columns: Column[];
   profile: Profile | null;
@@ -20,6 +34,7 @@ type Props = {
   onY: (name: string) => void;
   onFilter: (filter: Filter) => void;
   onRemove: (i: number) => void;
+  onClear: () => void;
   onColumn: (name: string) => void;
 };
 export default function Sidebar({
@@ -30,6 +45,7 @@ export default function Sidebar({
   onY,
   onFilter,
   onRemove,
+  onClear,
   onColumn,
 }: Props) {
   const [search, setSearch] = useState("");
@@ -38,9 +54,18 @@ export default function Sidebar({
   const [op, setOp] = useState<Filter["op"]>("eq");
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  const activeColumn = columns.find((item) => item.name === col);
+  const suggestedValues =
+    activeColumn?.kind === "text"
+      ? profile?.columns.find((item) => item.name === col)?.values || []
+      : [];
   function add() {
     const c = columns.find((c) => c.name === col) || columns[0];
     if (!c) return;
+    if (!['is_null', 'not_null'].includes(op) && !value.trim()) {
+      setError(c.kind === "text" ? "値を選んでください。" : "値を入力してください。");
+      return;
+    }
     let parsed: any = value;
     if (
       c.kind === "number" &&
@@ -118,17 +143,27 @@ export default function Sidebar({
       <div className="sidebar-title filter-title">
         <span>
           <FilterIcon size={14} /> 条件
+          {view.filters.length > 0 && (
+            <small className="filter-count">{view.filters.length}</small>
+          )}
         </span>
-        <button
-          className="icon-button"
-          title="フィルタを追加"
-          onClick={() => {
-            setAdding(!adding);
-            if (!col && columns[0]) setCol(columns[0].name);
-          }}
-        >
-          <Plus size={15} />
-        </button>
+        <div className="filter-heading-actions">
+          {view.filters.length > 0 && (
+            <button className="link-button" onClick={onClear}>
+              解除
+            </button>
+          )}
+          <button
+            className="icon-button"
+            title="フィルタを追加"
+            onClick={() => {
+              setAdding(!adding);
+              if (!col && columns[0]) setCol(columns[0].name);
+            }}
+          >
+            <Plus size={15} />
+          </button>
+        </div>
       </div>
       <div className="filter-list">
         {view.filters.length === 0 && !adding && (
@@ -139,7 +174,9 @@ export default function Sidebar({
             <div>
               <b>{f.column}</b>
               <small>
-                {f.op} {format(f.value)}
+                {operatorLabels[f.op]}
+                {!["is_null", "not_null"].includes(f.op) &&
+                  ` · ${format(f.value)}`}
               </small>
             </div>
             <button
@@ -156,7 +193,15 @@ export default function Sidebar({
         <div className="filter-builder">
           <label>
             列
-            <select value={col} onChange={(e) => setCol(e.target.value)}>
+            <select
+              value={col}
+              onChange={(e) => {
+                const next = columns.find((item) => item.name === e.target.value);
+                setCol(e.target.value);
+                setValue("");
+                if (next?.kind === "number" && op === "contains") setOp("eq");
+              }}
+            >
               {columns.map((c) => (
                 <option key={c.name}>{c.name}</option>
               ))}
@@ -170,7 +215,12 @@ export default function Sidebar({
             >
               <option value="eq">等しい</option>
               <option value="ne">等しくない</option>
-              <option value="contains">含む</option>
+              <option
+                value="contains"
+                disabled={activeColumn?.kind === "number"}
+              >
+                含む
+              </option>
               <option value="ge">以上</option>
               <option value="le">以下</option>
               <option value="gt">より大きい</option>
@@ -180,13 +230,30 @@ export default function Sidebar({
             </select>
           </label>
           {!["is_null", "not_null"].includes(op) && (
-            <input
-              aria-label="条件の値"
-              placeholder="値"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && add()}
-            />
+            activeColumn?.kind === "text" && suggestedValues.length > 0 ? (
+              <select
+                aria-label="条件の値"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              >
+                <option value="">値を選ぶ</option>
+                {suggestedValues
+                  .filter((item) => item.value !== null)
+                  .map((item) => (
+                    <option key={String(item.value)} value={String(item.value)}>
+                      {format(item.value)} · {item.count.toLocaleString()}行
+                    </option>
+                  ))}
+              </select>
+            ) : (
+              <input
+                aria-label="条件の値"
+                placeholder={activeColumn?.kind === "number" ? "数値" : "値"}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && add()}
+              />
+            )
           )}
           <button className="button primary small" onClick={add}>
             適用

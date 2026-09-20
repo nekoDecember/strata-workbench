@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   applyRowChecks,
   dataQuery,
+  format,
   initialWorkspace,
   mergeSelection,
   queryForChart,
@@ -57,6 +58,10 @@ describe("linked selection contract", () => {
     const [trace] = buildFigure(data, config, [42]);
     expect(trace.customdata).toEqual([99, 42]);
     expect(trace.selectedpoints).toEqual([1]);
+  });
+
+  it("does not round tiny statistical values down to zero", () => {
+    expect(format(0.00000042)).toBe("4.20e-7");
   });
   it("dims groups without selected rows without dropping them", () => {
     const config: ChartConfig = {

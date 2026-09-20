@@ -27,6 +27,7 @@ import {
   Save,
   ScatterChart,
   ShieldCheck,
+  Sparkles,
   Table2,
   Trash2,
   Undo2,
@@ -70,7 +71,40 @@ const kindLabels: Record<ChartConfig["kind"], string> = {
   time: "時系列",
   correlation: "相関行列",
 };
+const filterOperatorLabels: Record<DataFilter["op"], string> = {
+  eq: "=",
+  ne: "≠",
+  gt: ">",
+  ge: "≥",
+  lt: "<",
+  le: "≤",
+  contains: "含む",
+  in: "いずれか",
+  not_in: "いずれでもない",
+  is_null: "欠損",
+  not_null: "欠損以外",
+};
 type Mode = "replace" | "add" | "subtract";
+
+function describeFilter(filter: DataFilter) {
+  if (["is_null", "not_null"].includes(filter.op))
+    return `${filter.column} ${filterOperatorLabels[filter.op]}`;
+  const value = Array.isArray(filter.value)
+    ? filter.value.map((item) => format(item)).join(", ")
+    : format(filter.value);
+  return `${filter.column} ${filterOperatorLabels[filter.op]} ${value}`;
+}
+
+function describeFocus(config: ChartConfig) {
+  const target = config.y || "数値列";
+  if (config.kind === "scatter" || config.kind === "time") {
+    const x = config.x || "行ID";
+    return `${target}と${x}の関係を${config.group ? `${config.group}ごとに` : ""}見る`;
+  }
+  if (config.kind === "correlation") return "数値列どうしの関係を見つける";
+  if (config.kind === "histogram") return `${target}の分布の形を確かめる`;
+  return `${target}のばらつきを${config.group ? `${config.group}ごとに` : ""}比べる`;
+}
 
 function Login({ onLogin }: { onLogin: () => void }) {
   const [token, setToken] = useState("");
@@ -634,7 +668,9 @@ export default function App() {
         ...w.pins,
         {
           id: crypto.randomUUID(),
-          title: `${w.config.y} / ${w.config.group || "全体"}`,
+          title: `${w.config.y} · ${w.config.group || "全体"}${
+            w.view.filters.length ? ` · ${describeFilter(w.view.filters[0])}` : ""
+          }`,
           config: { ...w.config },
           view: structuredClone(w.view),
           notes: "",
@@ -665,6 +701,10 @@ export default function App() {
     dataset.current_revision !== ws.view.revision
   );
   const yStats = profile?.columns.find((c) => c.name === ws?.config.y);
+  const focus = ws ? describeFocus(ws.config) : "";
+  const scope = ws?.view.filters.length
+    ? ws.view.filters.map(describeFilter).join(" · ")
+    : "全データ";
   if (auth === null)
     return (
       <div className="initial-loading">
@@ -791,12 +831,17 @@ export default function App() {
       ) : (
         <>
           <div className="workspace-title">
-            <div>
+            <div className="workspace-title-copy">
               <div className="eyebrow">
                 WORKSPACE <span>/</span>{" "}
                 {dataset.parent ? "DERIVED DATA" : "DATA EXPLORATION"}
               </div>
               <h1>{dataset.name}</h1>
+              <div className="workspace-focus">
+                <Sparkles size={13} />
+                <span>視点</span>
+                <b>{focus}</b>
+              </div>
             </div>
             <div className="workspace-meta">
               <span>
@@ -808,6 +853,10 @@ export default function App() {
                 行
               </span>
               <span>{schema.length} 列</span>
+              <span className="scope-meta" title={scope}>
+                <span className="scope-dot" />
+                {scope}
+              </span>
               <button
                 className={`revision-badge ${dirtyRevision ? "historical" : ""}`}
                 onClick={() => setHistory(true)}
@@ -855,10 +904,11 @@ export default function App() {
             <div className="topbar-spacer" />
             <div
               className="selection-modes"
+              aria-label="選択モード"
               title="グラフとセル範囲の選択に適用。行のチェックは個別に追加・解除します。"
             >
               <MousePointer2 size={13} />
-              <span>選択</span>
+              <span>選択モード</span>
               {(
                 [
                   { id: "replace", name: "置換" },
@@ -895,9 +945,29 @@ export default function App() {
                     filters: ws.view.filters.filter((_, idx) => idx !== i),
                   })
                 }
+                onClear={() => updateView({ filters: [] })}
               />
             )}
             <main className="main-workspace">
+              {ws.activeTab === "explore" && (
+                <div className="explore-context">
+                  <div className="explore-context-copy">
+                    <span className="eyebrow">CURRENT FOCUS</span>
+                    <strong>{focus}</strong>
+                    <span>{scope} · グラフの点を選ぶと元の行を確認できます</span>
+                  </div>
+                  <div className="explore-context-stat">
+                    <span>対象</span>
+                    <b>{table.total.toLocaleString()}</b>
+                    <small>行</small>
+                  </div>
+                  <div className="explore-context-stat selected-stat">
+                    <span>選択</span>
+                    <b>{selected.length.toLocaleString()}</b>
+                    <small>行</small>
+                  </div>
+                </div>
+              )}
               {ws.activeTab === "explore" && (
                 <section className="explore-pane">
                   <div className="chart-toolbar">

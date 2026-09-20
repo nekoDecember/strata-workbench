@@ -4,14 +4,14 @@ import { format } from "./state";
 import { AlertCircle, LoaderCircle } from "lucide-react";
 
 const PALETTE = [
-  "#158b8b",
-  "#4674c1",
-  "#d98b38",
-  "#af618b",
-  "#737cc0",
-  "#739a4b",
-  "#8e6c58",
-  "#407980",
+  "#3157c7",
+  "#b77836",
+  "#765ca8",
+  "#536273",
+  "#b15b62",
+  "#95743e",
+  "#3e718a",
+  "#7f8992",
 ];
 function label(value: Scalar) {
   return value === null ? "(欠損)" : String(value);
@@ -120,7 +120,7 @@ export function buildFigure(
         opacity: selected.length ? (g.selected ? 1 : 0.18) : 1,
         marker: { color: config.group ? color(g.group) : PALETTE[0] },
         line: { width: 1.5 },
-        fillcolor: config.group ? color(g.group) + "33" : "#158b8b33",
+        fillcolor: config.group ? color(g.group) + "33" : "#3157c733",
         customdata: [g.group],
         hovertext: `n=${g.n.toLocaleString()} · 選択 ${g.selected || 0} · 平均 ${format(g.mean)} · SD ${format(g.std)}`,
         hoverinfo: "text+y+name",
@@ -162,9 +162,9 @@ export function buildFigure(
       z: data.values,
       customdata: data.counts,
       colorscale: [
-        [0, "#4b6cb7"],
-        [0.5, "#f4f7fa"],
-        [1, "#158b8b"],
+        [0, "#4a66ba"],
+        [0.5, "#f4f4f2"],
+        [1, "#b77836"],
       ],
       zmin: -1,
       zmax: 1,
@@ -222,11 +222,11 @@ export default function Chart({
               t: 18,
               b: config.kind === "correlation" ? 85 : 54,
             },
-            paper_bgcolor: "#ffffff",
-            plot_bgcolor: "#ffffff",
+            paper_bgcolor: "#fbfbf9",
+            plot_bgcolor: "#fbfbf9",
             font: {
               family: 'Inter, "Noto Sans JP", system-ui, sans-serif',
-              color: "#42566a",
+              color: "#4f5157",
               size: 12,
             },
             xaxis: {
@@ -234,7 +234,7 @@ export default function Chart({
                 text: config.kind === "correlation" ? "" : xLabel,
                 font: { size: 12 },
               },
-              gridcolor: "#edf1f5",
+              gridcolor: "#e7e7e3",
               zeroline: false,
               automargin: true,
             },
@@ -243,7 +243,7 @@ export default function Chart({
                 text: config.kind === "correlation" ? "" : yLabel,
                 font: { size: 12 },
               },
-              gridcolor: "#edf1f5",
+              gridcolor: "#e7e7e3",
               zeroline: false,
               automargin: true,
               ...(range ? { range, autorange: false } : { autorange: true }),

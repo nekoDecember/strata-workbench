@@ -97,10 +97,12 @@ export function dataQuery(view: View) {
 }
 export function format(value: unknown, digits = 5): string {
   if (value === null || value === undefined) return "—";
-  if (typeof value === "number")
-    return Number.isFinite(value)
-      ? value.toLocaleString("ja-JP", { maximumFractionDigits: digits })
-      : "—";
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) return "—";
+    if (value !== 0 && Math.abs(value) < 10 ** -digits)
+      return value.toExponential(2);
+    return value.toLocaleString("ja-JP", { maximumFractionDigits: digits });
+  }
   return String(value);
 }
 export function selectionAfterRowRemoval(ids: number[], removed: number[]) {

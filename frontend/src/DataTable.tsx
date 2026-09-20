@@ -176,22 +176,22 @@ export default function DataTable({
         onCellEdited={cellEdited}
         getRowThemeOverride={(i) =>
           ids.has(rows[i]?.__row_id)
-            ? { bgCell: "#e1f3f2", bgCellMedium: "#e1f3f2" }
+            ? { bgCell: "#edf1ff", bgCellMedium: "#edf1ff" }
             : i % 2
-              ? { bgCell: "#fafcfd" }
+              ? { bgCell: "#fafaf8" }
               : undefined
         }
         theme={{
-          accentColor: "#148b8b",
-          accentLight: "#e1f3f2",
-          textDark: "#253a4a",
-          textMedium: "#607385",
-          textLight: "#8b9aaa",
-          bgHeader: "#f2f5f8",
-          bgHeaderHovered: "#e7edf2",
-          bgHeaderHasFocus: "#e0ecee",
-          borderColor: "#e4eaf0",
-          horizontalBorderColor: "#eef2f5",
+          accentColor: "#3157c7",
+          accentLight: "#edf1ff",
+          textDark: "#252629",
+          textMedium: "#666862",
+          textLight: "#92938d",
+          bgHeader: "#f1f1ee",
+          bgHeaderHovered: "#e9e9e5",
+          bgHeaderHasFocus: "#e4e7f4",
+          borderColor: "#deded9",
+          horizontalBorderColor: "#e9e9e5",
           baseFontStyle: "13px",
           headerFontStyle: "600 12px",
           fontFamily: 'Inter, "Noto Sans JP", system-ui, sans-serif',

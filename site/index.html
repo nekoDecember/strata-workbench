@@ -1,0 +1,2518 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Strata Workbenchを最短で使いこなすための、探索・選択・比較・Pythonの実践ガイド。"
+    />
+    <title>Strata Workbench — 使い方ガイド</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #173548;
+        --ink-soft: #426073;
+        --muted: #728896;
+        --faint: #9badb8;
+        --navy: #102b3d;
+        --navy-2: #183c50;
+        --teal: #148b89;
+        --teal-dark: #087673;
+        --teal-soft: #e5f4f1;
+        --aqua: #b9e6de;
+        --orange: #c9823d;
+        --orange-soft: #fff2e4;
+        --blue-soft: #eaf1fb;
+        --paper: #ffffff;
+        --canvas: #eef3f6;
+        --line: #dfe8ed;
+        --line-strong: #cbdbe3;
+        --shadow: 0 16px 45px rgba(21, 55, 72, 0.08);
+        --radius: 16px;
+        --radius-sm: 10px;
+        font-family:
+          Inter, "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        font-synthesis: none;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 84% 0%, rgba(185, 230, 222, 0.42), transparent 27rem),
+          var(--canvas);
+        line-height: 1.7;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid rgba(20, 139, 137, 0.3);
+        outline-offset: 3px;
+      }
+
+      .skip-link {
+        position: fixed;
+        z-index: 30;
+        top: 12px;
+        left: 12px;
+        transform: translateY(-160%);
+        padding: 8px 12px;
+        border-radius: 7px;
+        color: #fff;
+        background: var(--navy);
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      .site-shell {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: fixed;
+        z-index: 20;
+        inset: 0 auto 0 0;
+        display: flex;
+        flex-direction: column;
+        width: 252px;
+        padding: 28px 18px 22px;
+        color: #c5d5dd;
+        background:
+          linear-gradient(165deg, rgba(28, 67, 84, 0.52), transparent 42%),
+          var(--navy);
+        box-shadow: 12px 0 36px rgba(16, 43, 61, 0.08);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #fff;
+        font-size: 25px;
+        font-weight: 700;
+        letter-spacing: -0.9px;
+      }
+
+      .brand-mark {
+        position: relative;
+        display: inline-flex;
+        width: 25px;
+        height: 25px;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand-mark::before,
+      .brand-mark::after,
+      .brand-mark span {
+        position: absolute;
+        display: block;
+        width: 16px;
+        height: 4px;
+        border-radius: 6px;
+        background: #6ac6bd;
+        content: "";
+        transform: rotate(-34deg);
+      }
+
+      .brand-mark::before {
+        top: 5px;
+        left: 1px;
+        opacity: 0.55;
+      }
+
+      .brand-mark span {
+        top: 10px;
+        left: 5px;
+      }
+
+      .brand-mark::after {
+        top: 15px;
+        left: 9px;
+        opacity: 0.72;
+      }
+
+      .brand-dot {
+        color: #6ac6bd;
+      }
+
+      .side-kicker {
+        margin: 34px 8px 10px;
+        color: #6d9baa;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.7px;
+      }
+
+      .side-nav {
+        display: grid;
+        gap: 4px;
+      }
+
+      .side-nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: #9cb2be;
+        font-size: 12px;
+        transition: 0.16s ease;
+      }
+
+      .side-nav a:hover,
+      .side-nav a.active {
+        color: #e6f6f3;
+        background: rgba(115, 210, 198, 0.11);
+        border-color: rgba(115, 210, 198, 0.16);
+      }
+
+      .nav-index {
+        display: inline-grid;
+        width: 21px;
+        height: 21px;
+        place-items: center;
+        border: 1px solid rgba(156, 198, 204, 0.3);
+        border-radius: 6px;
+        color: #77beb9;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .side-bottom {
+        margin-top: auto;
+        padding: 14px 10px 0;
+        border-top: 1px solid rgba(207, 230, 236, 0.12);
+        color: #7692a0;
+        font-size: 11px;
+        line-height: 1.6;
+      }
+
+      .side-bottom strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #b8d3d7;
+        font-size: 12px;
+      }
+
+      .content {
+        width: calc(100% - 252px);
+        margin-left: 252px;
+        min-width: 0;
+      }
+
+      .topbar {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        min-height: 70px;
+        padding: 14px clamp(22px, 4.4vw, 64px);
+        border-bottom: 1px solid rgba(203, 219, 227, 0.8);
+        background: rgba(238, 243, 246, 0.86);
+        backdrop-filter: blur(14px);
+      }
+
+      .topbar-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.35px;
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 210px;
+        padding: 7px 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.68);
+        color: var(--muted);
+      }
+
+      .search-box svg {
+        flex: 0 0 auto;
+      }
+
+      .search-box input {
+        width: 100%;
+        min-width: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: var(--ink);
+        font-size: 12px;
+      }
+
+      .search-meta {
+        padding: 3px 6px;
+        border-radius: 5px;
+        color: var(--faint);
+        background: #f5f8fa;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .external-link,
+      .button-primary,
+      .button-quiet {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 35px;
+        padding: 7px 12px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: 0.16s ease;
+      }
+
+      .external-link,
+      .button-primary {
+        color: #fff;
+        background: var(--teal);
+        box-shadow: 0 6px 16px rgba(20, 139, 137, 0.16);
+      }
+
+      .external-link:hover,
+      .button-primary:hover {
+        background: var(--teal-dark);
+        transform: translateY(-1px);
+      }
+
+      .button-quiet {
+        border: 1px solid var(--line-strong);
+        color: var(--ink-soft);
+        background: rgba(255, 255, 255, 0.72);
+      }
+
+      .button-quiet:hover {
+        border-color: var(--teal);
+        color: var(--teal-dark);
+        background: #fff;
+      }
+
+      .mobile-menu {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--line-strong);
+        border-radius: 7px;
+        color: var(--ink-soft);
+        background: #fff;
+      }
+
+      .inner {
+        width: min(1180px, calc(100% - 44px));
+        margin: 0 auto;
+      }
+
+      .hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1.22fr) minmax(290px, 0.78fr);
+        gap: clamp(32px, 7vw, 92px);
+        align-items: center;
+        min-height: 550px;
+        padding: 74px 0 64px;
+      }
+
+      .hero::before {
+        position: absolute;
+        z-index: -1;
+        top: 58px;
+        right: 1%;
+        width: 280px;
+        height: 280px;
+        border: 1px solid rgba(20, 139, 137, 0.1);
+        border-radius: 50%;
+        content: "";
+        box-shadow:
+          0 0 0 32px rgba(20, 139, 137, 0.025),
+          0 0 0 64px rgba(20, 139, 137, 0.025);
+      }
+
+      .eyebrow {
+        margin-bottom: 17px;
+        color: var(--teal);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 1.9px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      .hero h1 {
+        max-width: 660px;
+        margin-bottom: 22px;
+        color: var(--navy);
+        font-size: clamp(39px, 5vw, 65px);
+        font-weight: 560;
+        letter-spacing: -0.075em;
+        line-height: 1.12;
+      }
+
+      .hero h1 em {
+        color: var(--teal);
+        font-style: normal;
+        white-space: nowrap;
+      }
+
+      .hero-lede {
+        max-width: 575px;
+        margin-bottom: 29px;
+        color: var(--ink-soft);
+        font-size: 16px;
+        line-height: 2;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+      }
+
+      .hero-facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .fact {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--ink-soft);
+        background: rgba(255, 255, 255, 0.58);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .fact i {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--teal);
+      }
+
+      .hero-card {
+        position: relative;
+        overflow: hidden;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 19px;
+        color: #dbe9ec;
+        background:
+          linear-gradient(145deg, rgba(30, 75, 92, 0.55), transparent 60%),
+          var(--navy);
+        box-shadow: 0 24px 50px rgba(16, 43, 61, 0.2);
+      }
+
+      .hero-card::after {
+        position: absolute;
+        right: -35px;
+        bottom: -70px;
+        width: 160px;
+        height: 160px;
+        border: 1px solid rgba(106, 198, 189, 0.26);
+        border-radius: 50%;
+        content: "";
+      }
+
+      .card-overline {
+        margin-bottom: 10px;
+        color: #73beb8;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.6px;
+      }
+
+      .hero-card h2 {
+        margin-bottom: 19px;
+        color: #fff;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        line-height: 1.35;
+      }
+
+      .today-list {
+        display: grid;
+        gap: 8px;
+        margin: 0 0 20px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .today-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        color: #adc4cb;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .today-list b {
+        display: inline-grid;
+        width: 19px;
+        height: 19px;
+        flex: 0 0 auto;
+        place-items: center;
+        border-radius: 5px;
+        color: var(--navy);
+        background: #75c8c0;
+        font-size: 10px;
+      }
+
+      .hero-card-note {
+        position: relative;
+        z-index: 1;
+        padding-top: 15px;
+        border-top: 1px solid rgba(200, 227, 232, 0.14);
+        color: #7897a4;
+        font-size: 11px;
+      }
+
+      .section {
+        scroll-margin-top: 95px;
+        padding: 71px 0;
+        border-top: 1px solid rgba(203, 219, 227, 0.78);
+      }
+
+      .section-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 26px;
+        margin-bottom: 30px;
+      }
+
+      .section-heading > div:first-child {
+        max-width: 720px;
+      }
+
+      .section-kicker {
+        margin-bottom: 8px;
+        color: var(--orange);
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1.6px;
+      }
+
+      .section h2 {
+        margin-bottom: 11px;
+        color: var(--navy);
+        font-size: clamp(27px, 4vw, 40px);
+        font-weight: 580;
+        letter-spacing: -0.065em;
+        line-height: 1.2;
+      }
+
+      .section-intro {
+        margin-bottom: 0;
+        color: var(--ink-soft);
+        font-size: 14px;
+      }
+
+      .section-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.58);
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .section-tag::before {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--teal);
+        content: "";
+      }
+
+      .steps {
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 12px;
+      }
+
+      .steps::before {
+        position: absolute;
+        top: 27px;
+        right: 9%;
+        left: 9%;
+        height: 1px;
+        background: var(--line-strong);
+        content: "";
+      }
+
+      .step-card {
+        position: relative;
+        z-index: 1;
+        min-height: 188px;
+        padding: 17px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-sm);
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 10px 30px rgba(29, 68, 87, 0.045);
+        transition: 0.18s ease;
+      }
+
+      .step-card:hover {
+        border-color: #a5d9d3;
+        background: #fff;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+      }
+
+      .step-number {
+        display: inline-grid;
+        width: 21px;
+        height: 21px;
+        place-items: center;
+        margin-bottom: 24px;
+        border-radius: 6px;
+        color: #fff;
+        background: var(--teal);
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .step-card h3 {
+        margin-bottom: 7px;
+        color: var(--navy);
+        font-size: 14px;
+      }
+
+      .step-card p {
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.75;
+      }
+
+      .step-card a {
+        display: inline-flex;
+        margin-top: 10px;
+        color: var(--teal-dark);
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .callout {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: start;
+        margin-top: 18px;
+        padding: 16px 18px;
+        border: 1px solid #cfe9e5;
+        border-radius: var(--radius-sm);
+        color: #38636c;
+        background: var(--teal-soft);
+        font-size: 12px;
+      }
+
+      .callout-icon {
+        display: grid;
+        width: 25px;
+        height: 25px;
+        place-items: center;
+        border-radius: 7px;
+        color: #fff;
+        background: var(--teal);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .callout strong {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--teal-dark);
+      }
+
+      .map-grid {
+        display: grid;
+        grid-template-columns: 0.84fr 1.16fr;
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .map-copy,
+      .mock-workbench,
+      .panel-card,
+      .chart-lab,
+      .selection-card,
+      .compare-card,
+      .python-card,
+      .safe-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.87);
+        box-shadow: 0 10px 28px rgba(29, 68, 87, 0.045);
+      }
+
+      .map-copy {
+        padding: 26px;
+      }
+
+      .map-copy h3 {
+        margin-bottom: 18px;
+        color: var(--navy);
+        font-size: 19px;
+        letter-spacing: -0.04em;
+      }
+
+      .map-list {
+        display: grid;
+        gap: 13px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .map-list li {
+        display: grid;
+        grid-template-columns: 30px 1fr;
+        gap: 10px;
+        align-items: start;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .map-list b {
+        display: grid;
+        width: 29px;
+        height: 29px;
+        place-items: center;
+        border-radius: 8px;
+        color: var(--teal-dark);
+        background: var(--teal-soft);
+        font-size: 11px;
+      }
+
+      .map-list strong {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--ink);
+      }
+
+      .mock-workbench {
+        overflow: hidden;
+        background: #f7fafb;
+      }
+
+      .mock-top {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 42px;
+        padding: 0 13px;
+        color: #c8dce2;
+        background: var(--navy);
+        font-size: 10px;
+      }
+
+      .mock-logo {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .mock-logo i {
+        color: #6ac6bd;
+        font-style: normal;
+      }
+
+      .mock-dataset {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding-left: 9px;
+        border-left: 1px solid #355364;
+      }
+
+      .mock-dots {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+      }
+
+      .mock-dots span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #7194a0;
+      }
+
+      .mock-nav {
+        display: flex;
+        gap: 2px;
+        padding: 0 10px;
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+      }
+
+      .mock-nav span {
+        padding: 8px 13px 7px;
+        color: #92a2ab;
+        font-size: 10px;
+      }
+
+      .mock-nav span.active {
+        border-bottom: 2px solid var(--teal);
+        color: var(--teal);
+        font-weight: 800;
+      }
+
+      .mock-body {
+        display: grid;
+        grid-template-columns: 122px 1fr;
+        min-height: 340px;
+      }
+
+      .mock-side {
+        padding: 13px 9px;
+        border-right: 1px solid var(--line);
+        background: #f9fbfc;
+      }
+
+      .mock-side-title {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 3px 8px;
+        color: #768b97;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .mock-input {
+        height: 22px;
+        margin-bottom: 8px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #fff;
+      }
+
+      .mock-column {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        padding: 6px 4px;
+        border-radius: 4px;
+        color: #536d7b;
+        font-size: 9px;
+      }
+
+      .mock-column.active {
+        color: #247b7b;
+        background: #e5f4f1;
+      }
+
+      .mock-column b {
+        display: inline-grid;
+        width: 15px;
+        height: 15px;
+        place-items: center;
+        border-radius: 3px;
+        color: #fff;
+        background: #4f9d9e;
+        font-size: 8px;
+      }
+
+      .mock-column small {
+        display: block;
+        margin-top: 1px;
+        color: #a0afb8;
+        font-size: 8px;
+      }
+
+      .mock-main {
+        min-width: 0;
+        padding: 12px;
+      }
+
+      .mock-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 29px;
+        padding-bottom: 9px;
+        color: #607987;
+        font-size: 9px;
+      }
+
+      .mock-select {
+        padding: 5px 7px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: #486676;
+        background: #fff;
+      }
+
+      .mock-axis {
+        padding: 3px 5px;
+        border-radius: 3px;
+        color: #fff;
+        background: var(--teal);
+        font-weight: 800;
+      }
+
+      .mock-chart-area {
+        display: grid;
+        grid-template-columns: 1fr 112px;
+        min-height: 228px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .mock-plot {
+        position: relative;
+        min-width: 0;
+        overflow: hidden;
+        padding: 14px;
+      }
+
+      .mock-plot-caption {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 7px;
+        color: #446679;
+        font-size: 9px;
+        font-weight: 700;
+      }
+
+      .mock-plot svg {
+        display: block;
+        width: 100%;
+        height: 170px;
+      }
+
+      .mock-summary {
+        padding: 13px 9px;
+        border-left: 1px solid var(--line);
+        background: #fbfcfd;
+      }
+
+      .mock-summary-title {
+        margin-bottom: 9px;
+        color: #536f7e;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .mock-summary table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #8397a3;
+        font-size: 8px;
+      }
+
+      .mock-summary th,
+      .mock-summary td {
+        padding: 5px 0;
+        border-bottom: 1px solid #edf2f4;
+        text-align: right;
+      }
+
+      .mock-summary th:first-child {
+        text-align: left;
+      }
+
+      .mock-summary td:last-child {
+        color: var(--teal);
+        font-weight: 800;
+      }
+
+      .mock-table {
+        margin-top: 10px;
+        padding: 8px 9px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .mock-table-head,
+      .mock-row {
+        display: grid;
+        grid-template-columns: 28px 1fr 1fr 1fr;
+        gap: 7px;
+        padding: 4px 0;
+        border-bottom: 1px solid #f0f3f5;
+        color: #8396a0;
+        font-size: 8px;
+      }
+
+      .mock-table-head {
+        color: #55717f;
+        font-weight: 800;
+      }
+
+      .mock-row:last-child {
+        border-bottom: 0;
+      }
+
+      .mock-row.selected {
+        margin: 0 -4px;
+        padding-right: 4px;
+        padding-left: 4px;
+        border-radius: 3px;
+        color: #1b7777;
+        background: #e5f4f1;
+      }
+
+      .mock-check {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border: 1px solid #aebfc7;
+        border-radius: 2px;
+      }
+
+      .mock-row.selected .mock-check {
+        border-color: var(--teal);
+        background: var(--teal);
+        box-shadow: inset 0 0 0 2px #fff;
+      }
+
+      .mini-note {
+        margin-top: 10px;
+        color: var(--faint);
+        font-size: 10px;
+      }
+
+      .chart-lab {
+        overflow: hidden;
+      }
+
+      .lab-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 7px;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .lab-toolbar strong {
+        margin-right: 5px;
+        color: var(--navy);
+        font-size: 12px;
+      }
+
+      .lab-tab {
+        padding: 6px 9px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        background: #f9fbfc;
+        font-size: 11px;
+      }
+
+      .lab-tab:hover,
+      .lab-tab.active {
+        border-color: #a7d9d4;
+        color: var(--teal-dark);
+        background: var(--teal-soft);
+        font-weight: 800;
+      }
+
+      .lab-panels {
+        min-height: 260px;
+        padding: 24px;
+      }
+
+      .lab-panel {
+        display: none;
+        grid-template-columns: minmax(0, 1fr) 240px;
+        gap: 28px;
+        align-items: center;
+      }
+
+      .lab-panel.active {
+        display: grid;
+      }
+
+      .lab-graphic {
+        position: relative;
+        min-height: 205px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background:
+          linear-gradient(#edf3f5 1px, transparent 1px),
+          linear-gradient(90deg, #edf3f5 1px, transparent 1px),
+          #fff;
+        background-size: 34px 34px;
+      }
+
+      .lab-graphic::after {
+        position: absolute;
+        right: 12px;
+        bottom: 10px;
+        color: #afbdc4;
+        content: "Y";
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .lab-graphic::before {
+        position: absolute;
+        bottom: 7px;
+        left: 12px;
+        color: #afbdc4;
+        content: "X";
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .dot {
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #4b76bf;
+        opacity: 0.78;
+      }
+
+      .dot.teal {
+        background: var(--teal);
+      }
+
+      .dot.orange {
+        background: #d28942;
+      }
+
+      .dot.selected {
+        width: 14px;
+        height: 14px;
+        border: 3px solid #fff;
+        background: var(--teal);
+        box-shadow: 0 0 0 2px var(--teal);
+        opacity: 1;
+      }
+
+      .lab-explanation h3 {
+        margin-bottom: 9px;
+        color: var(--navy);
+        font-size: 18px;
+        letter-spacing: -0.035em;
+      }
+
+      .lab-explanation p {
+        margin-bottom: 13px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.8;
+      }
+
+      .tip-line {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 8px;
+        border-radius: 5px;
+        color: #89602f;
+        background: var(--orange-soft);
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        height: 150px;
+        padding: 20px 28px 26px;
+      }
+
+      .bars span {
+        flex: 1;
+        min-width: 13px;
+        border-radius: 4px 4px 1px 1px;
+        background: #66b8b3;
+      }
+
+      .bars span:nth-child(1) { height: 20%; }
+      .bars span:nth-child(2) { height: 38%; }
+      .bars span:nth-child(3) { height: 64%; }
+      .bars span:nth-child(4) { height: 92%; background: var(--teal); }
+      .bars span:nth-child(5) { height: 78%; background: #4e9e9d; }
+      .bars span:nth-child(6) { height: 48%; }
+      .bars span:nth-child(7) { height: 27%; }
+      .bars span:nth-child(8) { height: 13%; }
+
+      .boxplot {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        height: 100%;
+        padding: 22px 35px;
+      }
+
+      .boxplot::before {
+        position: absolute;
+        top: 50%;
+        right: 30px;
+        left: 30px;
+        height: 1px;
+        background: #dfe9ed;
+        content: "";
+      }
+
+      .box-item {
+        position: relative;
+        z-index: 1;
+        width: 45px;
+        height: 120px;
+      }
+
+      .box-item::before {
+        position: absolute;
+        top: 18px;
+        bottom: 18px;
+        left: 50%;
+        border-left: 2px solid #7eabb0;
+        content: "";
+      }
+
+      .box-item span {
+        position: absolute;
+        top: 39%;
+        left: 8px;
+        width: 30px;
+        height: 32%;
+        border: 2px solid var(--teal);
+        border-radius: 5px;
+        background: #dff2ef;
+      }
+
+      .box-item b {
+        position: absolute;
+        top: 54%;
+        right: 7px;
+        left: 7px;
+        border-top: 2px solid var(--teal-dark);
+      }
+
+      .heatmap {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        width: 210px;
+        height: 180px;
+        margin: 14px auto;
+        gap: 4px;
+      }
+
+      .heatmap i {
+        border-radius: 3px;
+        background: #dce8f3;
+      }
+
+      .heatmap i:nth-child(3n) { background: #83bdbb; }
+      .heatmap i:nth-child(4n) { background: #4a75bb; }
+      .heatmap i:nth-child(7n) { background: #237f81; }
+      .heatmap i:nth-child(11n) { background: #f0d7b8; }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      .selection-card,
+      .compare-card,
+      .python-card,
+      .safe-card {
+        padding: 24px;
+      }
+
+      .selection-card h3,
+      .compare-card h3,
+      .python-card h3,
+      .safe-card h3 {
+        margin-bottom: 7px;
+        color: var(--navy);
+        font-size: 20px;
+        letter-spacing: -0.04em;
+      }
+
+      .card-lede {
+        margin-bottom: 19px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .mode-picker {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+
+      .mode-button {
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        background: #f8fafb;
+        font-size: 11px;
+      }
+
+      .mode-button.active {
+        border-color: #9bd4ce;
+        color: var(--teal-dark);
+        background: var(--teal-soft);
+        font-weight: 800;
+      }
+
+      .mode-result {
+        min-height: 69px;
+        padding: 12px;
+        border-left: 3px solid var(--teal);
+        border-radius: 5px;
+        color: #4d6c7b;
+        background: #f5f9fa;
+        font-size: 12px;
+      }
+
+      .mode-result strong {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--navy);
+      }
+
+      .rule-list {
+        display: grid;
+        gap: 9px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .rule-list li {
+        display: flex;
+        gap: 9px;
+        align-items: flex-start;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .rule-list li::before {
+        display: grid;
+        width: 18px;
+        height: 18px;
+        flex: 0 0 auto;
+        place-items: center;
+        margin-top: 1px;
+        border-radius: 5px;
+        color: var(--teal-dark);
+        background: var(--teal-soft);
+        content: "✓";
+        font-size: 10px;
+        font-weight: 900;
+      }
+
+      .selection-note {
+        margin-top: 18px;
+        padding-top: 15px;
+        border-top: 1px solid var(--line);
+        color: var(--ink-soft);
+        font-size: 11px;
+      }
+
+      .selection-note code,
+      code.inline {
+        padding: 2px 5px;
+        border-radius: 4px;
+        color: var(--teal-dark);
+        background: var(--teal-soft);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 0.92em;
+      }
+
+      .compare-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 20px;
+        align-items: stretch;
+      }
+
+      .compare-card {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .pin-flow {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+        margin: 4px 0 17px;
+      }
+
+      .pin-flow div {
+        min-height: 80px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fafcfd;
+      }
+
+      .pin-flow b {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--teal);
+        font-size: 10px;
+      }
+
+      .pin-flow span {
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .compare-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: auto;
+      }
+
+      .compare-meta span {
+        padding: 5px 7px;
+        border-radius: 5px;
+        color: #637f8e;
+        background: #edf4f7;
+        font-size: 10px;
+      }
+
+      .warning {
+        padding: 13px;
+        border-radius: 8px;
+        color: #8a663a;
+        background: var(--orange-soft);
+        font-size: 11px;
+      }
+
+      .warning strong {
+        display: block;
+        margin-bottom: 3px;
+        color: #9a6b2f;
+      }
+
+      .table-like {
+        overflow: hidden;
+        margin-top: 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+
+      .table-like div {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 8px 10px;
+        border-bottom: 1px solid #edf2f4;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .table-like div:last-child {
+        border-bottom: 0;
+      }
+
+      .table-like b {
+        color: var(--ink);
+      }
+
+      .python-card {
+        grid-column: 1 / -1;
+      }
+
+      .python-intro {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .python-intro > div:first-child {
+        max-width: 590px;
+      }
+
+      .shortcut {
+        padding: 7px 9px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        background: #fafcfd;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .code-layout {
+        display: grid;
+        grid-template-columns: 210px minmax(0, 1fr);
+        gap: 16px;
+        margin-top: 19px;
+      }
+
+      .code-tabs {
+        display: grid;
+        align-content: start;
+        gap: 5px;
+      }
+
+      .code-tab {
+        padding: 9px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: var(--muted);
+        background: #fafcfd;
+        text-align: left;
+        font-size: 11px;
+      }
+
+      .code-tab.active,
+      .code-tab:hover {
+        border-color: #a9d8d4;
+        color: var(--teal-dark);
+        background: var(--teal-soft);
+        font-weight: 800;
+      }
+
+      .code-frame {
+        position: relative;
+        min-height: 220px;
+        overflow: auto;
+        border: 1px solid #27495a;
+        border-radius: 9px;
+        background: #112e40;
+      }
+
+      .copy-button {
+        position: absolute;
+        z-index: 1;
+        top: 10px;
+        right: 10px;
+        padding: 5px 7px;
+        border: 1px solid rgba(210, 238, 235, 0.2);
+        border-radius: 5px;
+        color: #b9d5d9;
+        background: rgba(255, 255, 255, 0.07);
+        font-size: 10px;
+      }
+
+      .copy-button:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.13);
+      }
+
+      .code-panel {
+        display: none;
+        margin: 0;
+        padding: 19px 18px;
+        color: #c9e1e2;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 11px;
+        line-height: 1.8;
+        white-space: pre;
+      }
+
+      .code-panel.active {
+        display: block;
+      }
+
+      .token-comment { color: #80a7a7; }
+      .token-keyword { color: #83d2c4; }
+      .token-string { color: #e6bf8e; }
+      .token-name { color: #bcd8ed; }
+
+      .api-legend {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+        margin-top: 15px;
+      }
+
+      .api-legend div {
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: #fafcfd;
+      }
+
+      .api-legend code {
+        display: block;
+        margin-bottom: 3px;
+        color: var(--teal-dark);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .api-legend span {
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .data-table {
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      .data-table table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+      }
+
+      .data-table th,
+      .data-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #edf2f4;
+        vertical-align: top;
+        font-size: 12px;
+      }
+
+      .data-table th {
+        color: #6a8491;
+        background: #f7fafb;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+      }
+
+      .data-table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .data-table td:first-child {
+        width: 170px;
+        color: var(--navy);
+        font-weight: 800;
+      }
+
+      .data-table td:not(:first-child) {
+        color: var(--muted);
+      }
+
+      .data-table strong {
+        color: var(--ink-soft);
+      }
+
+      .safe-grid {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 20px;
+      }
+
+      .safe-card p {
+        margin-bottom: 13px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .details-list {
+        display: grid;
+        gap: 9px;
+      }
+
+      details {
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-height: 45px;
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 800;
+        list-style: none;
+      }
+
+      summary::-webkit-details-marker {
+        display: none;
+      }
+
+      summary::after {
+        color: var(--teal);
+        content: "+";
+        font-size: 18px;
+        font-weight: 400;
+      }
+
+      details[open] summary::after {
+        content: "−";
+      }
+
+      details p {
+        max-width: 720px;
+        margin: 0;
+        padding: 0 0 13px;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.8;
+      }
+
+      .footer {
+        padding: 30px 0 58px;
+        border-top: 1px solid rgba(203, 219, 227, 0.78);
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .footer-inner {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .footer strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--ink);
+        font-size: 12px;
+      }
+
+      .search-hidden {
+        display: none !important;
+      }
+
+      .search-result-note {
+        display: none;
+        margin: 0 0 25px;
+        padding: 11px 13px;
+        border-radius: 7px;
+        color: #56717e;
+        background: #f6fafb;
+        font-size: 11px;
+      }
+
+      .search-result-note.visible {
+        display: block;
+      }
+
+      @media (max-width: 1040px) {
+        .sidebar {
+          width: 224px;
+        }
+
+        .content {
+          width: calc(100% - 224px);
+          margin-left: 224px;
+        }
+
+        .steps {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .steps::before {
+          display: none;
+        }
+
+        .step-card:nth-child(4),
+        .step-card:nth-child(5) {
+          min-height: 155px;
+        }
+
+        .mock-chart-area {
+          grid-template-columns: 1fr;
+        }
+
+        .mock-summary {
+          display: none;
+        }
+      }
+
+      @media (max-width: 780px) {
+        .sidebar {
+          width: min(282px, 86vw);
+          transform: translateX(-105%);
+          transition: transform 0.2s ease;
+        }
+
+        body.nav-open .sidebar {
+          transform: translateX(0);
+        }
+
+        body.nav-open .topbar {
+          z-index: 21;
+        }
+
+        body.nav-open::after {
+          position: fixed;
+          z-index: 15;
+          inset: 0;
+          background: rgba(16, 43, 61, 0.3);
+          content: "";
+        }
+
+        .content {
+          width: 100%;
+          margin-left: 0;
+        }
+
+        .topbar {
+          min-height: 62px;
+          padding: 10px 18px;
+        }
+
+        .mobile-menu {
+          display: inline-flex;
+        }
+
+        .topbar-label {
+          display: none;
+        }
+
+        .topbar-actions {
+          width: 100%;
+        }
+
+        .search-box {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .search-meta {
+          display: none;
+        }
+
+        .external-link {
+          display: none;
+        }
+
+        .inner {
+          width: min(100% - 32px, 650px);
+        }
+
+        .hero {
+          grid-template-columns: 1fr;
+          min-height: 0;
+          padding: 58px 0 48px;
+        }
+
+        .hero-card {
+          max-width: 520px;
+        }
+
+        .hero h1 em {
+          white-space: normal;
+        }
+
+        .section {
+          padding: 53px 0;
+        }
+
+        .section-heading {
+          display: block;
+        }
+
+        .section-tag {
+          margin-top: 14px;
+        }
+
+        .steps,
+        .map-grid,
+        .two-column,
+        .compare-grid,
+        .safe-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .step-card,
+        .step-card:nth-child(4),
+        .step-card:nth-child(5) {
+          min-height: auto;
+        }
+
+        .step-number {
+          margin-bottom: 13px;
+        }
+
+        .mock-body {
+          grid-template-columns: 102px 1fr;
+        }
+
+        .mock-main {
+          padding: 9px;
+        }
+
+        .mock-plot svg {
+          height: 145px;
+        }
+
+        .lab-panel {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .lab-graphic {
+          min-height: 190px;
+        }
+
+        .code-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .code-tabs {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .api-legend {
+          grid-template-columns: 1fr;
+        }
+
+        .python-intro {
+          display: block;
+        }
+
+        .shortcut {
+          display: inline-block;
+          margin-top: 7px;
+        }
+
+        .data-table {
+          overflow-x: auto;
+        }
+
+        .data-table table {
+          min-width: 640px;
+        }
+
+        .footer-inner {
+          display: block;
+        }
+
+        .footer-inner > div + div {
+          margin-top: 14px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <div class="site-shell">
+      <aside class="sidebar" aria-label="ガイドの目次">
+        <a class="brand" href="#top" aria-label="Strata Workbench ガイドの先頭へ">
+          <span class="brand-mark" aria-hidden="true"><span></span></span>
+          <span>strata<span class="brand-dot">.</span></span>
+        </a>
+        <div class="side-kicker">FIELD GUIDE / 07 MINUTES</div>
+        <nav class="side-nav">
+          <a href="#quick-start"><span class="nav-index">01</span>まずはこの一周</a>
+          <a href="#map"><span class="nav-index">02</span>画面の見取り図</a>
+          <a href="#explore"><span class="nav-index">03</span>グラフで探索</a>
+          <a href="#select"><span class="nav-index">04</span>行を追いかける</a>
+          <a href="#compare"><span class="nav-index">05</span>切り口を比較</a>
+          <a href="#python"><span class="nav-index">06</span>Pythonで深掘り</a>
+          <a href="#save"><span class="nav-index">07</span>保存と引き継ぎ</a>
+        </nav>
+        <div class="side-bottom">
+          <strong>操作の合言葉</strong>
+          同じ行を、表・グラフ・Pythonで行き来する。
+        </div>
+      </aside>
+
+      <div class="content">
+        <header class="topbar">
+          <button class="mobile-menu" id="menuButton" aria-label="目次を開く" aria-expanded="false">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+          <div class="topbar-label">STRATA WORKBENCH / USER GUIDE</div>
+          <div class="topbar-actions">
+            <label class="search-box" for="guideSearch">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg>
+              <input id="guideSearch" type="search" placeholder="ガイド内を検索（ / ）" autocomplete="off" />
+              <span class="search-meta" id="searchMeta">すべて</span>
+            </label>
+            <a class="external-link" href="https://strata.nekodec.party/" target="_blank" rel="noopener noreferrer">
+              ワークベンチを開く
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3h7v7M10 14 21 3M21 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h6" /></svg>
+            </a>
+          </div>
+        </header>
+
+        <main id="main">
+          <div class="inner">
+            <div class="search-result-note" id="searchNote" role="status" aria-live="polite"></div>
+
+            <section class="hero" id="top" data-searchable data-keywords="strata strata workbench 使い方 ガイド 探索 表 グラフ python">
+              <div>
+                <div class="eyebrow">FIELD GUIDE / START HERE</div>
+                <h1>機能を覚える<br />より、<br /><em>行を追いかける。</em></h1>
+                <p class="hero-lede">
+                  Strataは、表で見つけた違和感をグラフで確かめ、必要ならPythonで深掘りするためのワークベンチです。全部を暗記しなくても、この一周だけで迷いにくくなります。
+                </p>
+                <div class="hero-actions">
+                  <a class="button-primary" href="#quick-start">7分で一周する <span aria-hidden="true">→</span></a>
+                  <a class="button-quiet" href="#map">画面を先に見る</a>
+                </div>
+                <div class="hero-facts" aria-label="Strataの特徴">
+                  <span class="fact"><i></i>表 ↔ グラフ</span>
+                  <span class="fact"><i></i>選択を保持</span>
+                  <span class="fact"><i></i>Python連携</span>
+                  <span class="fact"><i></i>リビジョン保存</span>
+                </div>
+              </div>
+
+              <aside class="hero-card">
+                <div class="card-overline">TODAY'S ROUTE</div>
+                <h2>まずはサンプルで、<br />「選ぶ → 比べる」を体験。</h2>
+                <ol class="today-list">
+                  <li><b>1</b><span>「サンプルで試す」で2,400行のデータを開く</span></li>
+                  <li><b>2</b><span>散布図の点を囲み、表の選択行を見る</span></li>
+                  <li><b>3</b><span>切り口を「比較に固定」して並べる</span></li>
+                  <li><b>4</b><span>Pythonタブで集計結果を画面へ返す</span></li>
+                </ol>
+                <div class="hero-card-note">サンプルは実在の製造データではなく、操作確認用の合成データです。</div>
+              </aside>
+            </section>
+
+            <section class="section" id="quick-start" data-searchable data-keywords="最初 使い始める サンプル 読み込む ファイル csv tsv parquet xlsx postgres 一周">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">01 / THE FIRST LOOP</div>
+                  <h2>最初は、5つの操作だけでいい。</h2>
+                  <p class="section-intro">Strataの中心は「同じ観測行を別の角度から見る」こと。下の順番で触ると、機能の多さが一つの流れにまとまります。</p>
+                </div>
+                <span class="section-tag">おすすめの順番</span>
+              </div>
+              <div class="steps">
+                <article class="step-card">
+                  <span class="step-number">01</span>
+                  <h3>サンプル / データを開く</h3>
+                  <p>初回は「サンプルで試す」。自分のデータは右上の「読み込む」から。</p>
+                  <a href="#import">読み込みのコツ →</a>
+                </article>
+                <article class="step-card">
+                  <span class="step-number">02</span>
+                  <h3>Y列を決める</h3>
+                  <p>左の列パネルか、上部のYセレクタで見たい数値列を選ぶ。</p>
+                  <a href="#explore">グラフの選び方 →</a>
+                </article>
+                <article class="step-card">
+                  <span class="step-number">03</span>
+                  <h3>点 / 行を選ぶ</h3>
+                  <p>グラフの点をクリック・投げ縄。表のチェックや範囲選択も同じ選択に合流する。</p>
+                  <a href="#select">選択のルール →</a>
+                </article>
+                <article class="step-card">
+                  <span class="step-number">04</span>
+                  <h3>比較に固定する</h3>
+                  <p>今のグラフ、条件、リビジョンをスナップショットとして保存する。</p>
+                  <a href="#compare">比較の使い方 →</a>
+                </article>
+                <article class="step-card">
+                  <span class="step-number">05</span>
+                  <h3>Pythonで返す</h3>
+                  <p>同じ表示条件の全行と選択行が、そのままPythonに渡る。</p>
+                  <a href="#python">Pythonの入口 →</a>
+                </article>
+              </div>
+              <div class="callout">
+                <span class="callout-icon">i</span>
+                <div><strong>迷ったら「選択」と「絞り込み」を分けて考える。</strong>選択は気になる行のマーク、絞り込みは表示・分析する母集団の変更です。似ていますが、別の操作です。</div>
+              </div>
+            </section>
+
+            <section class="section" id="map" data-searchable data-keywords="画面 見取り図 ui 列パネル 探索 比較 python データテーブル 要約">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">02 / ORIENTATION</div>
+                  <h2>画面は、4つの場所だけ見る。</h2>
+                  <p class="section-intro">上から下へ読むより、役割で覚えると今どこにいるかを見失いません。</p>
+                </div>
+                <span class="section-tag">探索画面の見取り図</span>
+              </div>
+              <div class="map-grid">
+                <article class="map-copy">
+                  <h3>視線の置き場所</h3>
+                  <ul class="map-list">
+                    <li><b>01</b><div><strong>左：列と条件</strong>列を探す、Yを決める、フィルタを足す場所。</div></li>
+                    <li><b>02</b><div><strong>中央上：グラフ</strong>分布や関係を見て、気になる行を選ぶ場所。</div></li>
+                    <li><b>03</b><div><strong>右：要約</strong>対象全体と選択集団の平均・中央値などを比べる場所。</div></li>
+                    <li><b>04</b><div><strong>下：データテーブル</strong>選択された元の行を確認・並べ替え・編集する場所。</div></li>
+                  </ul>
+                  <p class="mini-note">上部のタブは「探索 / 比較 / Python」。どのタブでも選択と状態は保存されます。</p>
+                </article>
+
+                <figure class="mock-workbench" aria-label="Strataの画面構成を示すイラスト">
+                  <div class="mock-top">
+                    <span class="mock-logo">strata<span>.</span></span>
+                    <span class="mock-dataset">▣ factory_measurements</span>
+                    <span class="mock-dots"><span></span><span></span><span></span></span>
+                  </div>
+                  <div class="mock-nav"><span class="active">◌ 探索</span><span>▦ 比較</span><span>⌘ Python</span></div>
+                  <div class="mock-body">
+                    <div class="mock-side">
+                      <div class="mock-side-title"><span>列</span><span>12</span></div>
+                      <div class="mock-input"></div>
+                      <div class="mock-column active"><b>#</b><span>径_mm<small>連続 · Y</small></span></div>
+                      <div class="mock-column"><b>#</b><span>温度_C<small>連続</small></span></div>
+                      <div class="mock-column"><b>◷</b><span>測定日時<small>日時</small></span></div>
+                      <div class="mock-column"><b>A</b><span>設備<small>カテゴリ</small></span></div>
+                      <div class="mock-column"><b>A</b><span>勤務帯<small>カテゴリ</small></span></div>
+                    </div>
+                    <div class="mock-main">
+                      <div class="mock-controls"><span class="mock-select">散布図⌄</span><span class="mock-axis">Y</span><span class="mock-select">径_mm⌄</span><span class="mock-axis">X</span><span class="mock-select">温度_C⌄</span><span class="mock-select">層別：設備⌄</span></div>
+                      <div class="mock-chart-area">
+                        <div class="mock-plot">
+                          <div class="mock-plot-caption"><span>径_mm / 散布図</span><span>n = 2,400</span></div>
+                          <svg viewBox="0 0 410 165" preserveAspectRatio="none" aria-hidden="true">
+                            <path d="M15 143H398M15 143V11" stroke="#dbe7eb" stroke-width="1" />
+                            <path d="M20 127C83 121 102 114 140 108S205 88 250 75 312 61 392 24" fill="none" stroke="#d3e6e6" stroke-width="1.5" stroke-dasharray="4 4" />
+                            <g fill="#4c76ba" opacity=".63"><circle cx="50" cy="123" r="4"/><circle cx="78" cy="117" r="4"/><circle cx="94" cy="125" r="4"/><circle cx="122" cy="103" r="4"/><circle cx="145" cy="108" r="4"/><circle cx="162" cy="94" r="4"/><circle cx="186" cy="98" r="4"/><circle cx="206" cy="84" r="4"/><circle cx="228" cy="89" r="4"/><circle cx="248" cy="69" r="4"/><circle cx="272" cy="77" r="4"/><circle cx="292" cy="59" r="4"/><circle cx="320" cy="54" r="4"/><circle cx="348" cy="46" r="4"/></g>
+                            <g fill="#138b89" opacity=".83"><circle cx="69" cy="132" r="4"/><circle cx="111" cy="112" r="4"/><circle cx="174" cy="105" r="4"/><circle cx="219" cy="80" r="4"/><circle cx="284" cy="67" r="4"/><circle cx="339" cy="36" r="4"/></g>
+                            <circle cx="248" cy="69" r="8" fill="#fff" stroke="#138b89" stroke-width="3" />
+                            <circle cx="272" cy="77" r="8" fill="#fff" stroke="#138b89" stroke-width="3" />
+                          </svg>
+                        </div>
+                        <div class="mock-summary">
+                          <div class="mock-summary-title">⌗ 径_mm</div>
+                          <table><thead><tr><th></th><th>対象</th><th>選択</th></tr></thead><tbody><tr><th>件数</th><td>2,400</td><td>187</td></tr><tr><th>平均</th><td>10.02</td><td>10.06</td></tr><tr><th>中央値</th><td>10.01</td><td>10.05</td></tr><tr><th>最大</th><td>10.13</td><td>10.13</td></tr></tbody></table>
+                        </div>
+                      </div>
+                      <div class="mock-table"><div class="mock-table-head"><span></span><span>測定日時</span><span>温度_C</span><span>径_mm</span></div><div class="mock-row"><span class="mock-check"></span><span>2026-04-01</span><span>23.1</span><span>10.01</span></div><div class="mock-row selected"><span class="mock-check"></span><span>2026-04-02</span><span>28.4</span><span>10.06</span></div><div class="mock-row selected"><span class="mock-check"></span><span>2026-04-02</span><span>29.0</span><span>10.07</span></div></div>
+                    </div>
+                  </div>
+                </figure>
+              </div>
+            </section>
+
+            <section class="section" id="explore" data-searchable data-keywords="グラフ 探索 散布図 時系列 ヒストグラム 箱ひげ図 相関行列 x y 層別 ビン">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">03 / EXPLORE</div>
+                  <h2>グラフは「問い」で選ぶ。</h2>
+                  <p class="section-intro">グラフの種類を増やすことが目的ではありません。今の問いに合わせて、同じY列を見方だけ変えます。</p>
+                </div>
+                <span class="section-tag">下のタブを押して確認</span>
+              </div>
+              <div class="chart-lab">
+                <div class="lab-toolbar" role="tablist" aria-label="グラフの種類">
+                  <strong>見たいこと</strong>
+                  <button class="lab-tab active" data-chart="scatter" role="tab" aria-selected="true">関係を見る</button>
+                  <button class="lab-tab" data-chart="time" role="tab" aria-selected="false">時間を見る</button>
+                  <button class="lab-tab" data-chart="histogram" role="tab" aria-selected="false">分布を見る</button>
+                  <button class="lab-tab" data-chart="box" role="tab" aria-selected="false">群を比べる</button>
+                  <button class="lab-tab" data-chart="correlation" role="tab" aria-selected="false">相関を探す</button>
+                </div>
+                <div class="lab-panels">
+                  <div class="lab-panel active" data-chart-panel="scatter">
+                    <div class="lab-graphic" aria-label="散布図のイラスト">
+                      <span class="dot teal" style="left:13%;bottom:28%"></span><span class="dot" style="left:22%;bottom:35%"></span><span class="dot orange" style="left:28%;bottom:31%"></span><span class="dot" style="left:39%;bottom:45%"></span><span class="dot teal selected" style="left:55%;bottom:57%"></span><span class="dot teal selected" style="left:63%;bottom:49%"></span><span class="dot" style="left:69%;bottom:66%"></span><span class="dot orange" style="left:79%;bottom:72%"></span><span class="dot" style="left:86%;bottom:78%"></span><span class="dot teal" style="left:47%;bottom:44%"></span><span class="dot" style="left:33%;bottom:41%"></span><span class="dot orange" style="left:72%;bottom:58%"></span>
+                    </div>
+                    <div class="lab-explanation"><h3>散布図</h3><p>XとYの関係、外れた点、設備やカテゴリごとの違いを見る。点を投げ縄で囲むと、その行が下の表で選ばれます。</p><span class="tip-line">最初の一枚はこれがおすすめ</span></div>
+                  </div>
+                  <div class="lab-panel" data-chart-panel="time">
+                    <div class="lab-graphic" aria-label="時系列のイラスト"><svg viewBox="0 0 500 205" preserveAspectRatio="none" width="100%" height="100%"><path d="M28 171H473M28 171V25" stroke="#dbe7eb"/><path d="M30 144C80 150 95 114 133 128s46 26 72 6 35-41 67-37 38 38 70 10 37-38 70-30" fill="none" stroke="#148b89" stroke-width="4" stroke-linecap="round"/><path d="M30 122c53 12 77-15 111 2s45 15 67-7 40-28 71-8 40 25 65 0 43-21 128-38" fill="none" stroke="#4c76ba" stroke-width="3" stroke-linecap="round" opacity=".66"/></svg></div>
+                    <div class="lab-explanation"><h3>時系列</h3><p>日時列をXにして、変化・周期・工程の切り替わりを見る。細かく確認したい期間を先に条件で絞ると読みやすくなります。</p><span class="tip-line">Xは日時列にする</span></div>
+                  </div>
+                  <div class="lab-panel" data-chart-panel="histogram">
+                    <div class="lab-graphic" aria-label="ヒストグラムのイラスト"><div class="bars"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+                    <div class="lab-explanation"><h3>ヒストグラム</h3><p>値がどこに集まっているかを見る。棒をクリックすると、そのビンの範囲に入る全行が選択されます。ビン数は10〜60から変更できます。</p><span class="tip-line">棒 = 値の範囲</span></div>
+                  </div>
+                  <div class="lab-panel" data-chart-panel="box">
+                    <div class="lab-graphic" aria-label="箱ひげ図のイラスト"><div class="boxplot"><div class="box-item"><span></span><b></b></div><div class="box-item"><span style="top:30%;height:42%"></span><b style="top:51%"></b></div><div class="box-item"><span style="top:44%;height:24%"></span><b style="top:55%"></b></div><div class="box-item"><span style="top:24%;height:28%"></span><b style="top:41%"></b></div></div></div>
+                    <div class="lab-explanation"><h3>箱ひげ図</h3><p>設備や勤務帯などの群ごとに、中央値・ばらつき・IQR外側の点を見る。箱をクリックすると群全体、外側の点をクリックすると元の行が選ばれます。</p><span class="tip-line">IQR外側 = 自動判定ではない</span></div>
+                  </div>
+                  <div class="lab-panel" data-chart-panel="correlation">
+                    <div class="lab-graphic" aria-label="相関行列のイラスト"><div class="heatmap"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+                    <div class="lab-explanation"><h3>相関行列</h3><p>数値列どうしのPearson相関を一覧で見る。セルをクリックすると、その2列をX/Yにした散布図へ切り替わります。</p><span class="tip-line">有効ペア数もホバーで確認</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="callout">
+                <span class="callout-icon">!</span>
+                <div><strong>大きなデータでは「描画」と「計算」を分けて考える。</strong>散布図・時系列の点は最大5,000点（設定上限20,000点）まで描画サンプルになります。一方、ヒストグラム・箱ひげ図・相関・要約の計算は対象の全行が基準です。</div>
+              </div>
+            </section>
+
+            <section class="section" id="select" data-searchable data-keywords="選択 行 選ぶ 投げ縄 置換 追加 解除 チェック 選択行のみ 除外 復元 フィルタ 条件">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">04 / FOLLOW THE ROW</div>
+                  <h2>選択は、調査のしおり。</h2>
+                  <p class="section-intro">「気になったもの」を選択として残すと、グラフから表、Pythonまで同じ集団を追跡できます。</p>
+                </div>
+                <span class="section-tag">選択は削除ではない</span>
+              </div>
+              <div class="two-column">
+                <article class="selection-card">
+                  <h3>選択モードを使い分ける</h3>
+                  <p class="card-lede">上部の「選択」には、グラフとセル範囲に効く3つのモードがあります。下で押して挙動を確認できます。</p>
+                  <div class="mode-picker" role="group" aria-label="選択モード">
+                    <button class="mode-button active" data-mode="replace">置換</button>
+                    <button class="mode-button" data-mode="add">追加</button>
+                    <button class="mode-button" data-mode="subtract">解除</button>
+                  </div>
+                  <div class="mode-result" id="modeResult"><strong>置換：新しい集団を見る</strong>今の選択を入れ替えます。まずはこれで「この点だけ」を確認。</div>
+                  <div class="selection-note">表のチェックはページをまたいだ選択を保持します。<code>選択行のみ</code>は表示を絞るだけで、元データを削除しません。</div>
+                </article>
+                <article class="selection-card">
+                  <h3>選択・条件・除外の違い</h3>
+                  <p class="card-lede">似た操作を、役割で分けて覚えると事故が減ります。</p>
+                  <ul class="rule-list">
+                    <li><span><strong>選択：</strong>気になる行をマーク。要約の「選択」列やPythonの <code class="inline">selected</code> に反映。</span></li>
+                    <li><span><strong>条件：</strong>列の値で母集団を絞る。グラフ・表・要約・Pythonの対象が変わる。</span></li>
+                    <li><span><strong>選択行のみ：</strong>選択した行だけを表示する。一時的な確認に便利。</span></li>
+                    <li><span><strong>除外：</strong>分析対象から外す。解除リンクで戻せる。</span></li>
+                  </ul>
+                </article>
+              </div>
+              <div class="callout">
+                <span class="callout-icon">↔</span>
+                <div><strong>行IDが橋渡しをする。</strong>グラフの点やPythonの集約表から戻ってこられるのは、内部の予約列 <code class="inline">__row_id</code> が元の観測を指し続けるからです。集約後の行は、その行に対応する元のIDをリンクとして持てます。</div>
+              </div>
+            </section>
+
+            <section class="section" id="compare" data-searchable data-keywords="比較 固定 ピン 切り口 スナップショット 8個 軸 範囲 メモ リビジョン">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">05 / COMPARE</div>
+                  <h2>「比較に固定」で、仮説を並べる。</h2>
+                  <p class="section-intro">探索中の良い切り口を一枚ずつ保存し、同じY軸で並べて差を見ます。比較は最大8個まで。</p>
+                </div>
+                <span class="section-tag">比較はスナップショット</span>
+              </div>
+              <div class="compare-grid">
+                <article class="compare-card">
+                  <h3>比較に固定する流れ</h3>
+                  <p class="card-lede">固定時点の条件・選択・リビジョンが残るので、「さっきの図」を再現しやすくなります。</p>
+                  <div class="pin-flow"><div><b>01 / EXPLORE</b><span>Y・X・層別と条件を決める</span></div><div><b>02 / PIN</b><span>「比較に固定」を押す</span></div><div><b>03 / READ</b><span>比較タブで並べ、メモする</span></div></div>
+                  <div class="compare-meta"><span>最大 8 切り口</span><span>同じリビジョンは選択連動</span><span>Y軸の範囲を揃えられる</span></div>
+                </article>
+                <article class="compare-card">
+                  <h3>比較で見るポイント</h3>
+                  <div class="warning"><strong>まず、母集団を確認。</strong>カード下部の r番号・条件数・n（件数）を見て、同じ条件の図を比べていないかチェックします。</div>
+                  <div class="table-like"><div><b>r1 · 設備A</b><span>n = 1,120</span></div><div><b>r1 · 設備B</b><span>n = 1,280</span></div><div><b>r2 · 夜勤のみ</b><span>閲覧専用</span></div></div>
+                </article>
+              </div>
+            </section>
+
+            <section class="section" id="python" data-searchable data-keywords="python df selected selection_mask context wb.show wb.publish wb.select 実行 中止 履歴 notebook 集計 派生列">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">06 / PYTHON</div>
+                  <h2>Pythonは、探索の続きを書く場所。</h2>
+                  <p class="section-intro">画面の状態を手でコピーし直す必要はありません。実行時点のリビジョン・表示条件・選択行・コードがジョブとして保存されます。</p>
+                </div>
+                <span class="section-tag">Ctrl / ⌘ + Enter で実行</span>
+              </div>
+              <article class="python-card">
+                <div class="python-intro">
+                  <div><h3>まず覚える4つの受け取り口</h3><p class="card-lede">画面内Pythonでは、表示条件に一致する全行が <code class="inline">df</code> に入り、選択行は別の <code class="inline">selected</code> に入ります。</p></div>
+                  <span class="shortcut">ワーカーが別プロセスで実行</span>
+                </div>
+                <div class="api-legend"><div><code>df</code><span>表示条件に一致する全行。描画サンプルではない。</span></div><div><code>selected</code><span>dfのうち、現在選択されている行。</span></div><div><code>context</code><span>現在のX / Y / 層別 / データ名など。</span></div></div>
+                <div class="code-layout">
+                  <div class="code-tabs" role="tablist" aria-label="Pythonの例">
+                    <button class="code-tab active" data-code-tab="summary" role="tab" aria-selected="true">現在の切り口を要約</button>
+                    <button class="code-tab" data-code-tab="link" role="tab" aria-selected="false">集計表から行へ戻す</button>
+                    <button class="code-tab" data-code-tab="publish" role="tab" aria-selected="false">派生列を表に戻す</button>
+                  </div>
+                  <div class="code-frame">
+                    <button class="copy-button" data-copy-target="summaryCode">コピー</button>
+                    <pre class="code-panel active" id="summaryCode"><span class="token-comment"># 表示中の条件で、Y列を要約</span>
+<span class="token-name">value</span> = <span class="token-name">context</span>[<span class="token-string">"y"</span>]
+<span class="token-name">group</span> = <span class="token-name">context</span>.get(<span class="token-string">"group"</span>)
+
+<span class="token-keyword">if</span> group:
+    summary = df.groupby(group, dropna=<span class="token-keyword">False</span>)[value].agg(
+        [<span class="token-string">"count"</span>, <span class="token-string">"mean"</span>, <span class="token-string">"std"</span>, <span class="token-string">"median"</span>]
+    )
+<span class="token-keyword">else</span>:
+    summary = df[[value]].describe()
+
+wb.show(summary, name=<span class="token-string">"現在の切り口で要約"</span>)</pre>
+                    <pre class="code-panel" id="linkCode"><span class="token-comment"># 各集約行に、対応する元の行IDを渡す</span>
+group, value = context[<span class="token-string">"group"</span>], context[<span class="token-string">"y"</span>]
+groups = list(df.groupby(group, dropna=<span class="token-keyword">False</span>))
+summary = pd.DataFrame([
+    {group: key, <span class="token-string">"平均"</span>: part[value].mean()}
+    <span class="token-keyword">for</span> key, part <span class="token-keyword">in</span> groups
+])
+wb.show(summary, name=<span class="token-string">"層別サマリー"</span>,
+        row_ids=[part[<span class="token-string">"__row_id"</span>].tolist()
+                 <span class="token-keyword">for</span> _, part <span class="token-keyword">in</span> groups])</pre>
+                    <pre class="code-panel" id="publishCode"><span class="token-comment"># 元の行IDを残したまま、派生列を追加</span>
+value = context[<span class="token-string">"y"</span>]
+out = df.copy()
+out[<span class="token-string">"平均との差"</span>] = out[value] - out[value].mean()
+
+<span class="token-comment"># 「表に戻す」で新しい派生データとして開く</span>
+wb.publish(out, name=<span class="token-string">"平均からの差を追加"</span>)</pre>
+                  </div>
+                </div>
+                <div class="callout">
+                  <span class="callout-icon">↗</span>
+                  <div><strong>出力の行リンクは、今のデータID・リビジョンと一致すると使える。</strong><code class="inline">wb.show()</code>は表・Plotly図・Matplotlib図・テキストを返せます。<code class="inline">wb.select(ids)</code>はPythonの条件で行を選ぶだけで、削除や除外はしません。</div>
+                </div>
+              </article>
+            </section>
+
+            <section class="section" id="save" data-searchable data-keywords="保存 リビジョン 履歴 編集 セル編集 型 変更 書き出し csv parquet notebook 引き継ぎ security 安全">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">07 / SAVE & HAND OFF</div>
+                  <h2>最後に、再現できる形で残す。</h2>
+                  <p class="section-intro">Strataは元データを直接上書きせず、変更や派生結果をリビジョンとして積み上げます。戻る道を残したまま、次の分析へ渡せます。</p>
+                </div>
+                <span class="section-tag">保存は自動 / 引き継ぎは任意</span>
+              </div>
+              <div class="safe-grid">
+                <article class="safe-card" id="import">
+                  <h3>読み込み時のチェック</h3>
+                  <p>ファイルでもPostgreSQLでも、最初に列の型と欠損を確認しておくと、その後のグラフ選びがスムーズです。</p>
+                  <ul class="rule-list"><li><span><strong>ファイル：</strong>CSV / TSV / Parquet / XLSX。CSVはUTF-8、CP932、Shift JISと区切りを指定できます。</span></li><li><span><strong>PostgreSQL：</strong>登録済み接続から読み取り専用SQLでスナップショットを取り込みます。</span></li><li><span><strong>型：</strong>数値・文字列・日時。列の型変更は新しいリビジョンになります。</span></li></ul>
+                  <div class="compare-meta"><span>ファイル上限 128MiB</span><span>SQL取込 最大20万行</span></div>
+                </article>
+                <article class="safe-card">
+                  <h3>履歴と引き継ぎ</h3>
+                  <p>右上の r番号から過去のリビジョンを確認できます。分析メモも同じ状態に残せます。</p>
+                  <div class="table-like"><div><b>元データ</b><span>r1 · 保持</span></div><div><b>セル編集 / 型変更</b><span>新しいr</span></div><div><b>Python publish</b><span>派生データ</span></div><div><b>Notebook</b><span>現在の条件を固定</span></div></div>
+                  <p class="mini-note">書き出しはParquet（型を保ちたいとき）かCSV（共有しやすさ重視）。画面下の「Notebookに引き継ぐ」も使えます。</p>
+                </article>
+              </div>
+              <div class="callout">
+                <span class="callout-icon">✓</span>
+                <div><strong>個人用の信頼できるコードを動かす環境として使う。</strong>Pythonワーカーはネットワークや秘密ファイルから分離されていますが、悪意あるコードを受け取るための完全なマルチユーザーサンドボックスではありません。</div>
+              </div>
+            </section>
+
+            <section class="section" data-searchable data-keywords="faq よくある質問 何から サンプル 選択 見えない Python 失敗 大きい">
+              <div class="section-heading">
+                <div>
+                  <div class="section-kicker">CHEAT SHEET / FAQ</div>
+                  <h2>つまずいたときの、短い答え。</h2>
+                </div>
+                <span class="section-tag">必要なところだけ開く</span>
+              </div>
+              <div class="details-list">
+                <details><summary>何から触ればいい？</summary><p>「サンプルで試す」→散布図でYを選ぶ→点を2つ囲む→表の選択行を見る、の順です。ここまでできればStrataの核は掴めています。</p></details>
+                <details><summary>点を選んだのに表が絞られない</summary><p>選択は母集団を変えず、行をマークする操作です。表だけにしたい場合はデータテーブルの「選択行のみ」を押してください。条件で母集団を変える場合は左の「条件」を追加します。</p></details>
+                <details><summary>グラフの点が全行ないように見える</summary><p>散布図と時系列は多いデータを最大5,000点まで描画サンプリングします。全行を計算している要約・ヒストグラム・箱ひげ図と役割が違います。細かく見たい期間や群を先に絞ってください。</p></details>
+                <details><summary>Pythonの結果が表に戻せない</summary><p>実行時のデータID・リビジョンと現在の画面が一致しているか確認してください。集計表から元行へ戻すには、各集約行に対応する <code class="inline">row_ids</code> を渡します。</p></details>
+              </div>
+            </section>
+
+            <footer class="footer">
+              <div class="footer-inner">
+                <div><strong>strata. / 操作ガイド</strong>表で確かめ、グラフで捉え、Pythonで深める。</div>
+                <div>このガイドは現在のStrata WorkbenchのUI・README・Python連携仕様に合わせた静的HTMLです。<br /><a href="https://strata.nekodec.party/" target="_blank" rel="noopener noreferrer">ワークベンチを開く ↗</a></div>
+              </div>
+            </footer>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const body = document.body;
+        const menuButton = document.getElementById("menuButton");
+        const search = document.getElementById("guideSearch");
+        const searchMeta = document.getElementById("searchMeta");
+        const searchNote = document.getElementById("searchNote");
+        const searchable = [...document.querySelectorAll("[data-searchable]")];
+
+        const closeMenu = () => {
+          body.classList.remove("nav-open");
+          menuButton?.setAttribute("aria-expanded", "false");
+        };
+
+        menuButton?.addEventListener("click", () => {
+          const open = body.classList.toggle("nav-open");
+          menuButton.setAttribute("aria-expanded", String(open));
+        });
+
+        document.querySelectorAll(".side-nav a, .sidebar .brand").forEach((link) => {
+          link.addEventListener("click", closeMenu);
+        });
+
+        const filterGuide = () => {
+          const term = search.value.trim().toLowerCase();
+          let hits = 0;
+          searchable.forEach((section) => {
+            const haystack = `${section.dataset.keywords || ""} ${section.textContent || ""}`.toLowerCase();
+            const match = !term || haystack.includes(term);
+            section.classList.toggle("search-hidden", !match);
+            if (match) hits += 1;
+          });
+          searchMeta.textContent = term ? `${hits}件` : "すべて";
+          if (term) {
+            searchNote.textContent = hits ? `「${term}」を含むガイドを表示しています。` : `「${term}」に一致するガイドはありません。検索語を短くしてみてください。`;
+            searchNote.classList.add("visible");
+          } else {
+            searchNote.classList.remove("visible");
+          }
+        };
+
+        search?.addEventListener("input", filterGuide);
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "/" && document.activeElement !== search) {
+            event.preventDefault();
+            search.focus();
+          }
+          if (event.key === "Escape" && document.activeElement === search) {
+            search.value = "";
+            filterGuide();
+            search.blur();
+          }
+        });
+
+        const chartTabs = [...document.querySelectorAll("[data-chart]")];
+        const chartPanels = [...document.querySelectorAll("[data-chart-panel]")];
+        chartTabs.forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const selected = tab.dataset.chart;
+            chartTabs.forEach((item) => {
+              const active = item === tab;
+              item.classList.toggle("active", active);
+              item.setAttribute("aria-selected", String(active));
+            });
+            chartPanels.forEach((panel) => panel.classList.toggle("active", panel.dataset.chartPanel === selected));
+          });
+        });
+
+        const modeText = {
+          replace: ["置換：新しい集団を見る", "今の選択を入れ替えます。まずはこれで「この点だけ」を確認。"],
+          add: ["追加：別の条件を重ねる", "すでに選んだ行を残して、次の点・範囲を足します。複数の候補をまとめたいときに。"],
+          subtract: ["解除：選択から外す", "今の選択から、クリック・投げ縄・範囲に入った行だけを外します。"],
+        };
+        const modeResult = document.getElementById("modeResult");
+        document.querySelectorAll("[data-mode]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const mode = button.dataset.mode;
+            document.querySelectorAll("[data-mode]").forEach((item) => item.classList.toggle("active", item === button));
+            const [title, bodyText] = modeText[mode];
+            modeResult.innerHTML = `<strong>${title}</strong>${bodyText}`;
+          });
+        });
+
+        const codeMap = { summary: "summaryCode", link: "linkCode", publish: "publishCode" };
+        document.querySelectorAll("[data-code-tab]").forEach((tab) => {
+          tab.addEventListener("click", () => {
+            const key = tab.dataset.codeTab;
+            document.querySelectorAll("[data-code-tab]").forEach((item) => {
+              const active = item === tab;
+              item.classList.toggle("active", active);
+              item.setAttribute("aria-selected", String(active));
+            });
+            document.querySelectorAll(".code-panel").forEach((panel) => panel.classList.toggle("active", panel.id === codeMap[key]));
+            document.querySelector(".copy-button")?.setAttribute("data-copy-target", codeMap[key]);
+          });
+        });
+
+        document.querySelectorAll("[data-copy-target]").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const target = document.getElementById(button.dataset.copyTarget);
+            if (!target) return;
+            const text = target.textContent || "";
+            try {
+              await navigator.clipboard.writeText(text);
+              button.textContent = "コピーしました";
+            } catch {
+              button.textContent = "選択してコピー";
+            }
+            window.setTimeout(() => { button.textContent = "コピー"; }, 1400);
+          });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const id = entry.target.id;
+            document.querySelectorAll(".side-nav a").forEach((link) => link.classList.toggle("active", link.getAttribute("href") === `#${id}`));
+          });
+        }, { rootMargin: "-32% 0px -58% 0px", threshold: 0 });
+        document.querySelectorAll("main section[id]").forEach((section) => observer.observe(section));
+      })();
+    </script>
+  </body>
+</html>
